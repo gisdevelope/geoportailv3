@@ -97,6 +97,7 @@ NGEO_LIBS_JS_FILES += \
 	node_modules/floatthead/dist/jquery.floatThead.min.js \
 	node_modules/angular-ui-slider/src/slider.js \
 	node_modules/proj4/dist/proj4.js \
+	node_modules/localforage/dist/localforage.min.js \
 	node_modules/angular-gettext/dist/angular-gettext.min.js \
 	node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js \
 	node_modules/bootstrap/dist/js/bootstrap.min.js \
