@@ -1,16 +1,16 @@
 goog.provide('app.QueryController');
 goog.provide('app.queryDirective');
 
-goog.require('app.Activetool');
-goog.require('app.GetDevice');
-goog.require('app.profileDirective');
+goog.require('app.module');
+goog.require('app.ShowProfile');
+goog.require('app.QueryStyles');
+goog.require('app.NotifyNotificationType');
 goog.require('goog.array');
 goog.require('goog.string');
-goog.require('ngeo');
-goog.require('ngeo.map.FeatureOverlay');
-goog.require('ngeo.map.FeatureOverlayMgr');
+goog.require('ol');
 goog.require('ol.extent');
 goog.require('ol.format.GeoJSON');
+goog.require('ol.geom.GeometryType');
 goog.require('ol.geom.MultiLineString');
 goog.require('ol.layer.Vector');
 goog.require('ol.proj');
