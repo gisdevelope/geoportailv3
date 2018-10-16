@@ -12,8 +12,6 @@ goog.provide('app.MainController');
 goog.require('app.module');
 goog.require('app.LocationControl');
 goog.require('app.Map');
-goog.require('goog.asserts');
-goog.require('goog.array');
 goog.require('goog.object');
 goog.require('ol.Feature');
 goog.require('ol.geom.Point');
@@ -436,25 +434,25 @@ app.MainController = function(
             }
           }.bind(this));
     var urlLocationInfo = appStateManager.getInitialValue('crosshair');
-    var infoOpen = goog.isDefAndNotNull(urlLocationInfo) &&
+    var infoOpen = urlLocationInfo !== undefined && urlLocationInfo !== null &&
       urlLocationInfo === 'true';
     this['layersOpen'] = (!this.appGetDevice_.testEnv('xs') &&
     !this['routingOpen'] &&
-    !goog.isDef(this.ngeoLocation_.getParam('map_id')) &&
+    this.ngeoLocation_.getParam('map_id') === undefined &&
     !infoOpen &&
     this.stateManager_.getValueFromLocalStorage('layersOpen') !== 'false') ?
     true : false;
     this['mymapsOpen'] = (!this.appGetDevice_.testEnv('xs') &&
-        goog.isDef(this.ngeoLocation_.getParam('map_id')) &&
+        this.ngeoLocation_.getParam('map_id') !== undefined &&
         !infoOpen) ? true : false;
-    $scope.$watch(goog.bind(function() {
+    $scope.$watch(function() {
       return this['layersOpen'];
-    }, this), goog.bind(function(newVal) {
+    }.bind(this), function(newVal) {
       if (newVal === false) {
         $('app-catalog .themes-switcher').collapse('show');
         $('app-themeswitcher #themes-content').collapse('hide');
       }
-    }, this));
+    }.bind(this));
     this.activeLayersComparator = (this.ngeoLocation_.getParam('lc') === 'true');
 
     $scope.$watch(function() {
@@ -613,7 +611,7 @@ app.MainController.prototype.createMap_ = function() {
  */
 app.MainController.prototype.createCesiumManager_ = function(cesiumURL, $rootScope) {
   // [minx, miny, maxx, maxy]
-  goog.asserts.assert(this.map_);
+  console.assert(this.map_);
   const cameraExtentInRadians = [5.31, 49.38, 6.64, 50.21].map(ol.math.toRadians);
   return new app.olcs.Lux3DManager(cesiumURL, cameraExtentInRadians, this.map_, this.ngeoLocation_,
     $rootScope, this.tiles3dLayers_, this.tiles3dUrl_);
@@ -636,9 +634,9 @@ app.MainController.prototype.is3dEnabled = function() {
  * @private
  */
 app.MainController.prototype.manageUserRoleChange_ = function(scope) {
-  scope.$watch(goog.bind(function() {
+  scope.$watch(function() {
     return this.appUserManager_.roleId;
-  }, this), goog.bind(function(newVal, oldVal) {
+  }.bind(this), function(newVal, oldVal) {
     if (newVal === null && oldVal === null) {
       // This happens at init time. We don't want to reload the themes
       // at this point, as the constructor already loaded them.
@@ -648,7 +646,7 @@ app.MainController.prototype.manageUserRoleChange_ = function(scope) {
     if (this.appMymaps_.isMymapsSelected()) {
       this.appMymaps_.loadMapInformation();
     }
-  }, this));
+  }.bind(this));
 };
 
 
@@ -669,17 +667,17 @@ app.MainController.prototype.manageSelectedLayers_ =
     function(scope) {
       ngeo.misc.syncArrays(this.map_.getLayers().getArray(),
       this['selectedLayers'], true, scope,
-      goog.bind(function(layer) {
+      function(layer) {
         if (layer instanceof ol.layer.Vector && layer.get('altitudeMode') === 'clampToGround') {
           return false;
         }
         return goog.array.indexOf(
             this.map_.getLayers().getArray(), layer) !== 0;
-      }, this)
+      }.bind(this)
   );
-      scope.$watchCollection(goog.bind(function() {
+      scope.$watchCollection(function() {
         return this['selectedLayers'];
-      }, this), goog.bind(function(newSelectedLayers, oldSelectedLayers) {
+      }.bind(this), function(newSelectedLayers, oldSelectedLayers) {
         this.map_.render();
         this.compareLayers_();
 
@@ -695,7 +693,7 @@ app.MainController.prototype.manageSelectedLayers_ =
             piwik.push(['trackPageView']);
           }
         }
-      }, this));
+      }.bind(this));
     };
 
 /**
@@ -738,7 +736,7 @@ app.MainController.prototype.switchLanguage = function(lang, track) {
   if (!goog.isBoolean(track)) {
     track = true;
   }
-  goog.asserts.assert(lang in this.langUrls_);
+  console.assert(lang in this.langUrls_);
   this.gettextCatalog_.setCurrentLanguage(lang);
   this.gettextCatalog_.loadRemote(this.langUrls_[lang]);
   this.locale_.NUMBER_FORMATS.GROUP_SEP = ' ';
@@ -772,18 +770,18 @@ app.MainController.prototype.getEncodedCurrentTheme = function() {
  * @private
  */
 app.MainController.prototype.initLanguage_ = function() {
-  this.scope_.$watch(goog.bind(function() {
+  this.scope_.$watch(function() {
     return this['lang'];
-  }, this), goog.bind(function(newValue) {
+  }.bind(this), function(newValue) {
     this.stateManager_.updateState({
       'lang': newValue
     });
-  }, this));
+  }.bind(this));
 
   var urlLanguage = /** @type {string|undefined} */
       (this.stateManager_.getInitialValue('lang'));
 
-  if (goog.isDef(urlLanguage) &&
+  if (urlLanguage !== undefined &&
       goog.object.containsKey(this.langUrls_, urlLanguage)) {
     this.switchLanguage(urlLanguage, false);
     return;
@@ -803,14 +801,14 @@ app.MainController.prototype.initMymaps_ = function() {
   var mapId = this.ngeoLocation_.getParam('map_id');
 
   this.appMymaps_.mapProjection = this.map_.getView().getProjection();
-  if (goog.isDef(mapId)) {
+  if (mapId !== undefined) {
     this.appMymaps_.setCurrentMapId(mapId,
         this.drawnFeatures_.getCollection()).then(
           function(features) {
             var x = this.stateManager_.getInitialValue('X');
             var y = this.stateManager_.getInitialValue('Y');
 
-            if (!goog.isDef(x) && !goog.isDef(y) &&
+            if (x === undefined && y === undefined &&
                 this.drawnFeatures_.getCollection().getLength() > 0) {
               this.map_.getView().fit(this.drawnFeatures_.getExtent(), {
                 size: /** @type {ol.Size} */ (this.map_.getSize())
@@ -823,9 +821,9 @@ app.MainController.prototype.initMymaps_ = function() {
   this.appMymaps_.map = this.map_;
   this.appMymaps_.layersChanged = this['layersChanged'];
   ol.events.listen(this.map_.getLayerGroup(), 'change',
-      goog.bind(function() {
+      function() {
         this.compareLayers_();
-      }, this), this);
+      }.bind(this), this);
 };
 
 
@@ -848,7 +846,7 @@ app.MainController.prototype.compareLayers_ = function() {
       } else {
         var selectedLabels = [];
         var selectedOpacities = [];
-        goog.array.forEach(this['selectedLayers'], function(item) {
+        this['selectedLayers'].forEach(function(item) {
           selectedLabels.push(item.get('label'));
           selectedOpacities.push('' + item.getOpacity());
         });
