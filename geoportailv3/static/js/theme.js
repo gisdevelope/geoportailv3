@@ -1,8 +1,9 @@
 /**
  * @fileoverview This service keeps and share the state of the theme.
  */
-goog.provide('app.Theme');
-goog.require('app.module');
+goog.module('app.Theme');
+goog.module.declareLegacyNamespace();
+const appModule = goog.require('app.module');
 
 
 /**
@@ -12,7 +13,7 @@ goog.require('app.module');
  * @param {app.Themes} appThemes The themes services.
  * @ngInject
  */
-app.Theme = function($window, ngeoLocation, appThemes) {
+exports = function($window, ngeoLocation, appThemes) {
 
   /**
    * @const
@@ -50,7 +51,7 @@ app.Theme = function($window, ngeoLocation, appThemes) {
    * @type {string}
    * @private
    */
-  this.currentTheme_ = app.Theme.DEFAULT_THEME_;
+  this.currentTheme_ = exports.DEFAULT_THEME_;
 
   /**
    * @type {ngeo.statemanager.Location}
@@ -63,12 +64,12 @@ app.Theme = function($window, ngeoLocation, appThemes) {
 /**
  * @param {string} themeId The id of the theme.
  */
-app.Theme.prototype.setCurrentTheme = function(themeId) {
+exports.prototype.setCurrentTheme = function(themeId) {
   this.currentTheme_ = themeId;
 
   var piwikSiteId = this.piwikSiteIdLookup_[this.currentTheme_];
   if (piwikSiteId === undefined || piwikSiteId === null) {
-    piwikSiteId = this.piwikSiteIdLookup_[app.Theme.DEFAULT_THEME_];
+    piwikSiteId = this.piwikSiteIdLookup_[exports.DEFAULT_THEME_];
   }
   var piwik = /** @type {Piwik} */ (this.window_['_paq']);
   piwik.push(['setSiteId', piwikSiteId]);
@@ -82,7 +83,7 @@ app.Theme.prototype.setCurrentTheme = function(themeId) {
 /**
  * @return {string} themeId The id of the theme.
  */
-app.Theme.prototype.getCurrentTheme = function() {
+exports.prototype.getCurrentTheme = function() {
   return this.currentTheme_;
 };
 
@@ -92,7 +93,7 @@ app.Theme.prototype.getCurrentTheme = function() {
  * @return {string} The theme.
  * @export
  */
-app.Theme.prototype.encodeThemeName = function(theme) {
+exports.prototype.encodeThemeName = function(theme) {
   if (theme !== undefined) {
     return theme.replace(/\s+/g, '_');
   }
@@ -102,8 +103,8 @@ app.Theme.prototype.encodeThemeName = function(theme) {
 /**
  * @return {string} themeId The id of the theme.
  */
-app.Theme.prototype.getDefaultTheme = function() {
-  return app.Theme.DEFAULT_THEME_;
+exports.prototype.getDefaultTheme = function() {
+  return exports.DEFAULT_THEME_;
 };
 
 
@@ -111,7 +112,7 @@ app.Theme.prototype.getDefaultTheme = function() {
  * @param {string} themeId The theme id to set in the path of the URL.
  * @private
  */
-app.Theme.prototype.setLocationPath_ = function(themeId) {
+exports.prototype.setLocationPath_ = function(themeId) {
   var pathElements = this.ngeoLocation_.getPath().split('/');
   console.assert(pathElements.length > 1);
   if (pathElements[pathElements.length - 1] === '') {
@@ -132,7 +133,7 @@ app.Theme.prototype.setLocationPath_ = function(themeId) {
  * @param {Array.<string>} pathElements Array of path elements.
  * @return {boolean} theme in path.
  */
-app.Theme.prototype.themeInUrl = function(pathElements) {
+exports.prototype.themeInUrl = function(pathElements) {
   var indexOfTheme = pathElements.indexOf('theme');
   return indexOfTheme >= 0 &&
       pathElements.indexOf('theme') == pathElements.length - 2;
@@ -143,6 +144,6 @@ app.Theme.prototype.themeInUrl = function(pathElements) {
  * @const
  * @private
  */
-app.Theme.DEFAULT_THEME_ = 'main';
+exports.DEFAULT_THEME_ = 'main';
 
-app.module.service('appTheme', app.Theme);
+appModule.service('appTheme', exports);

@@ -7,28 +7,29 @@
  * application. It also defines the behavior of elements of the HTML page (the
  * management of the sidebar for example).
  */
-goog.provide('app.MainController');
+goog.module('app.MainController');
 
-goog.require('app.module');
-goog.require('app.LocationControl');
-goog.require('app.Map');
-goog.require('ol.Feature');
-goog.require('ol.geom.Point');
-goog.require('ol.MapProperty');
-goog.require('ol.interaction');
-goog.require('ol.layer.Vector');
-goog.require('ngeo.misc.syncArrays');
-goog.require('ol.events');
-goog.require('ol.Object');
-goog.require('ol.View');
-goog.require('ol.control.Attribution');
-goog.require('ol.control.FullScreen');
-goog.require('ol.control.OverviewMap');
-goog.require('ol.control.Zoom');
-goog.require('app.olcs.ZoomToExtent');
-goog.require('app.olcs.Lux3DManager');
-goog.require('ol.proj');
-goog.require('ol.math');
+goog.module.declareLegacyNamespace();
+const appModule = goog.require('app.module');
+const appLocationControl = goog.require('app.LocationControl');
+const appMap = goog.require('app.Map');
+const olFeature = goog.require('ol.Feature');
+const olGeomPoint = goog.require('ol.geom.Point');
+const olMapProperty = goog.require('ol.MapProperty');
+const olInteraction = goog.require('ol.interaction');
+const olLayerVector = goog.require('ol.layer.Vector');
+const ngeoMiscSyncArrays = goog.require('ngeo.misc.syncArrays');
+const olEvents = goog.require('ol.events');
+const olObject = goog.require('ol.Object');
+const olView = goog.require('ol.View');
+const olControlAttribution = goog.require('ol.control.Attribution');
+const olControlFullScreen = goog.require('ol.control.FullScreen');
+const olControlOverviewMap = goog.require('ol.control.OverviewMap');
+const olControlZoom = goog.require('ol.control.Zoom');
+const appOlcsZoomToExtent = goog.require('app.olcs.ZoomToExtent');
+const appOlcsLux3DManager = goog.require('app.olcs.Lux3DManager');
+const olProj = goog.require('ol.proj');
+const olMath = goog.require('ol.math');
 
 
 /**
@@ -74,7 +75,7 @@ goog.require('ol.math');
  * @export
  * @ngInject
  */
-app.MainController = function(
+exports = function(
     $scope, ngeoFeatureOverlayMgr, ngeoBackgroundLayerMgr, ngeoOfflineServiceManager,
     gettextCatalog, appExclusionManager, appLayerOpacityManager,
     appLayerPermalinkManager, appMymaps, appStateManager, appThemes, appTheme,
@@ -220,7 +221,7 @@ app.MainController = function(
    * @private
    */
   this.maxExtent_ =
-      ol.proj.transformExtent(maxExtent, 'EPSG:4326', 'EPSG:3857');
+      olProj.transformExtent(maxExtent, 'EPSG:4326', 'EPSG:3857');
 
   /**
    * @type {angularGettext.Catalog}
@@ -392,7 +393,7 @@ app.MainController = function(
   this.map_.set('ol3dm', this.ol3dm_);
 
   // Add the zoom to extent control in a second step since it depends on ol3dm.
-  this.map_.addControl(new app.olcs.ZoomToExtent(this.defaultExtent_, this.ol3dm_));
+  this.map_.addControl(new appOlcsZoomToExtent(this.defaultExtent_, this.ol3dm_));
 
   this.initLanguage_();
 
@@ -426,7 +427,7 @@ app.MainController = function(
                   return layer.get('label') === appOverviewMapBaseLayer;
                 }));
               this.map_.addControl(
-                new ol.control.OverviewMap(
+                new olControlOverviewMap(
                   {layers: [layer],
                     collapseLabel: '\u00BB',
                     label: '\u00AB'}));
@@ -490,8 +491,8 @@ app.MainController = function(
     for (i = 0; i < coordinates.length; i = i + 2) {
       var position = [
         parseFloat(coordinates[i + 1]), parseFloat(coordinates[i])];
-      var feature = new ol.Feature({
-        geometry: new ol.geom.Point((ol.proj.transform(position,
+      var feature = new olFeature({
+        geometry: new olGeomPoint((olProj.transform(position,
           'EPSG:4326', 'EPSG:3857')))
       });
       feature.set('label', '' + routeNumber);
@@ -524,7 +525,7 @@ app.MainController = function(
  * @private
  * @param {boolean} active 3d state
  */
-app.MainController.prototype.enable3dCallback_ = function(active) {
+exports.prototype.enable3dCallback_ = function(active) {
   if (!active) {
     return;
   }
@@ -542,7 +543,7 @@ app.MainController.prototype.enable3dCallback_ = function(active) {
  * @param {ngeo.map.FeatureOverlayMgr} featureOverlayMgr Feature overlay manager.
  * @private
  */
-app.MainController.prototype.addLocationControl_ =
+exports.prototype.addLocationControl_ =
     function(featureOverlayMgr) {
       var isActive = false;
       var activateGeoLocation = this.ngeoLocation_.getParam('tracking');
@@ -550,7 +551,7 @@ app.MainController.prototype.addLocationControl_ =
         isActive = true;
         this.ngeoLocation_.deleteParam('tracking');
       }
-      var locationControl = new app.LocationControl(/** @type {app.LocationControlOptions} */({
+      var locationControl = new appLocationControl(/** @type {app.LocationControlOptions} */({
         label: '\ue800',
         featureOverlayMgr: featureOverlayMgr,
         notify: this.notify_,
@@ -560,8 +561,8 @@ app.MainController.prototype.addLocationControl_ =
       }));
       this.map_.addControl(locationControl);
       if (isActive) {
-        ol.events.listenOnce(this.map_,
-          ol.Object.getChangeEventType(ol.MapProperty.VIEW), function(e) {
+        olEvents.listenOnce(this.map_,
+          olObject.getChangeEventType(olMapProperty.VIEW), function(e) {
             locationControl.handleCenterToLocation();
           }.bind(this));
       }
@@ -572,26 +573,26 @@ app.MainController.prototype.addLocationControl_ =
  * @private
  * @return {!app.Map} The extended ol.Map.
  */
-app.MainController.prototype.createMap_ = function() {
-  var interactions = ol.interaction.defaults({
+exports.prototype.createMap_ = function() {
+  var interactions = olInteraction.defaults({
     altShiftDragRotate: false,
     pinchRotate: false,
     constrainResolution: true
   });
-  var map = this['map'] = new app.Map({
+  var map = this['map'] = new appMap({
     logo: false,
     controls: [
-      new ol.control.Zoom({zoomInLabel: '\ue032', zoomOutLabel: '\ue033'}),
+      new olControlZoom({zoomInLabel: '\ue032', zoomOutLabel: '\ue033'}),
       // the zoom to extent control will be added later since it depends on ol3dm
-      new ol.control.FullScreen({label: '\ue01c', labelActive: '\ue02c'}),
-      new ol.control.Attribution({collapsible: false,
+      new olControlFullScreen({label: '\ue01c', labelActive: '\ue02c'}),
+      new olControlAttribution({collapsible: false,
         collapsed: false, className: 'geoportailv3-attribution'})
     ],
     interactions: interactions,
     keyboardEventTarget: document,
     loadTilesWhileInteracting: true,
     loadTilesWhileAnimating: true,
-    view: new ol.View({
+    view: new olView({
       maxZoom: 19,
       minZoom: 8,
       enableRotation: false,
@@ -608,11 +609,11 @@ app.MainController.prototype.createMap_ = function() {
  * @param {angular.Scope} $rootScope The root scope
  * @return {!app.olcs.Lux3DManager} The created manager.
  */
-app.MainController.prototype.createCesiumManager_ = function(cesiumURL, $rootScope) {
+exports.prototype.createCesiumManager_ = function(cesiumURL, $rootScope) {
   // [minx, miny, maxx, maxy]
   console.assert(this.map_ !== null && this.map_ !== undefined);
-  const cameraExtentInRadians = [5.31, 49.38, 6.64, 50.21].map(ol.math.toRadians);
-  return new app.olcs.Lux3DManager(cesiumURL, cameraExtentInRadians, this.map_, this.ngeoLocation_,
+  const cameraExtentInRadians = [5.31, 49.38, 6.64, 50.21].map(olMath.toRadians);
+  return new appOlcsLux3DManager(cesiumURL, cameraExtentInRadians, this.map_, this.ngeoLocation_,
     $rootScope, this.tiles3dLayers_, this.tiles3dUrl_);
 };
 
@@ -621,7 +622,7 @@ app.MainController.prototype.createCesiumManager_ = function(cesiumURL, $rootSco
  * @export
  * @return {boolean} Whether 3D is active.
  */
-app.MainController.prototype.is3dEnabled = function() {
+exports.prototype.is3dEnabled = function() {
   return this.ol3dm_.is3dEnabled();
 };
 
@@ -632,7 +633,7 @@ app.MainController.prototype.is3dEnabled = function() {
  * @param {angular.Scope} scope Scope.
  * @private
  */
-app.MainController.prototype.manageUserRoleChange_ = function(scope) {
+exports.prototype.manageUserRoleChange_ = function(scope) {
   scope.$watch(function() {
     return this.appUserManager_.roleId;
   }.bind(this), function(newVal, oldVal) {
@@ -653,7 +654,7 @@ app.MainController.prototype.manageUserRoleChange_ = function(scope) {
  * @private
  * @return {?angular.$q.Promise} Promise.
  */
-app.MainController.prototype.loadThemes_ = function() {
+exports.prototype.loadThemes_ = function() {
   return this.appThemes_.loadThemes(this.appUserManager_.roleId);
 };
 
@@ -662,12 +663,12 @@ app.MainController.prototype.loadThemes_ = function() {
  * @param {angular.Scope} scope Scope
  * @private
  */
-app.MainController.prototype.manageSelectedLayers_ =
+exports.prototype.manageSelectedLayers_ =
     function(scope) {
-      ngeo.misc.syncArrays(this.map_.getLayers().getArray(),
+      ngeoMiscSyncArrays(this.map_.getLayers().getArray(),
       this['selectedLayers'], true, scope,
       function(layer) {
-        if (layer instanceof ol.layer.Vector && layer.get('altitudeMode') === 'clampToGround') {
+        if (layer instanceof olLayerVector && layer.get('altitudeMode') === 'clampToGround') {
           return false;
         }
         return this.map_.getLayers().getArray().indexOf(layer) !== 0;
@@ -697,7 +698,7 @@ app.MainController.prototype.manageSelectedLayers_ =
 /**
  * @export
  */
-app.MainController.prototype.openFeedback = function() {
+exports.prototype.openFeedback = function() {
   if (this.sidebarOpen()) {
     this.closeSidebar();
     this['feedbackOpen'] = true;
@@ -709,7 +710,7 @@ app.MainController.prototype.openFeedback = function() {
 /**
  * @export
  */
-app.MainController.prototype.closeSidebar = function() {
+exports.prototype.closeSidebar = function() {
   this['mymapsOpen'] = this['layersOpen'] = this['infosOpen'] =
       this['feedbackOpen'] = this['legendsOpen'] = this['routingOpen'] = false;
 };
@@ -719,7 +720,7 @@ app.MainController.prototype.closeSidebar = function() {
  * @return {boolean} `true` if the sidebar should be open, otherwise `false`.
  * @export
  */
-app.MainController.prototype.sidebarOpen = function() {
+exports.prototype.sidebarOpen = function() {
   return this['mymapsOpen'] || this['layersOpen'] || this['infosOpen'] ||
       this['legendsOpen'] || this['feedbackOpen'] || this['routingOpen'];
 };
@@ -730,7 +731,7 @@ app.MainController.prototype.sidebarOpen = function() {
  * @param {boolean=} track track page view
  * @export
  */
-app.MainController.prototype.switchLanguage = function(lang, track) {
+exports.prototype.switchLanguage = function(lang, track) {
   if (typeof track !== 'boolean') {
     track = true;
   }
@@ -752,7 +753,7 @@ app.MainController.prototype.switchLanguage = function(lang, track) {
  * @return {string} the current theme.
  * @export
  */
-app.MainController.prototype.getCurrentTheme = function() {
+exports.prototype.getCurrentTheme = function() {
   return this.appTheme_.getCurrentTheme();
 };
 
@@ -760,14 +761,14 @@ app.MainController.prototype.getCurrentTheme = function() {
  * @return {string} the current theme.
  * @export
  */
-app.MainController.prototype.getEncodedCurrentTheme = function() {
+exports.prototype.getEncodedCurrentTheme = function() {
   return this.appTheme_.encodeThemeName(this.appTheme_.getCurrentTheme());
 };
 
 /**
  * @private
  */
-app.MainController.prototype.initLanguage_ = function() {
+exports.prototype.initLanguage_ = function() {
   this.scope_.$watch(function() {
     return this['lang'];
   }.bind(this), function(newValue) {
@@ -794,7 +795,7 @@ app.MainController.prototype.initLanguage_ = function() {
 /**
  * @private
  */
-app.MainController.prototype.initMymaps_ = function() {
+exports.prototype.initMymaps_ = function() {
   var mapId = this.ngeoLocation_.getParam('map_id');
 
   this.appMymaps_.mapProjection = this.map_.getView().getProjection();
@@ -817,7 +818,7 @@ app.MainController.prototype.initMymaps_ = function() {
   }
   this.appMymaps_.map = this.map_;
   this.appMymaps_.layersChanged = this['layersChanged'];
-  ol.events.listen(this.map_.getLayerGroup(), 'change',
+  olEvents.listen(this.map_.getLayerGroup(), 'change',
       function() {
         this.compareLayers_();
       }.bind(this), this);
@@ -830,7 +831,7 @@ app.MainController.prototype.initMymaps_ = function() {
  * between the displayed layers and the mymaps layers
  * @private
  */
-app.MainController.prototype.compareLayers_ = function() {
+exports.prototype.compareLayers_ = function() {
   if (this.appMymaps_.isEditable()) {
     this['layersChanged'] = false;
     var backgroundLayer = this.backgroundLayerMgr_.get(this.map_);
@@ -869,7 +870,7 @@ app.MainController.prototype.compareLayers_ = function() {
  * @param {string} selector JQuery selector for the tab link.
  * @export
  */
-app.MainController.prototype.showTab = function(selector) {
+exports.prototype.showTab = function(selector) {
   $(selector).tab('show');
 };
 
@@ -877,7 +878,7 @@ app.MainController.prototype.showTab = function(selector) {
 /**
  * @export
  */
-app.MainController.prototype.toggleThemeSelector = function() {
+exports.prototype.toggleThemeSelector = function() {
   var layerTree = $('app-catalog .themes-switcher');
   var themesSwitcher = $('app-themeswitcher #themes-content');
   var themeTab = $('#catalog');
@@ -900,7 +901,7 @@ app.MainController.prototype.toggleThemeSelector = function() {
 /**
  * @export
  */
-app.MainController.prototype.toggleTiles3dVisibility = function() {
+exports.prototype.toggleTiles3dVisibility = function() {
   this.tiles3dVisible = !this.tiles3dVisible;
   this.ol3dm_.set3dTilesetVisible(this.tiles3dVisible);
   this.stateManager_.updateState({
@@ -918,8 +919,8 @@ app.MainController.prototype.toggleTiles3dVisibility = function() {
  * @return {boolean} the state.
  * @export
  */
-app.MainController.prototype.isDisconnectedOrOffline = function() {
+exports.prototype.isDisconnectedOrOffline = function() {
   return this.offlineMode.isEnabled() || !!this.networkStatus_.isDisconnected();
 };
 
-app.module.controller('MainController', app.MainController);
+appModule.controller('MainController', exports);
