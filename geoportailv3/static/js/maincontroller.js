@@ -1,4 +1,7 @@
 /**
+ * @module app.MainController
+ */
+/**
  * @fileoverview This file defines the controller class for the application's
  * main controller (created using "ng-controller" in the page).
  *
@@ -7,30 +10,27 @@
  * application. It also defines the behavior of elements of the HTML page (the
  * management of the sidebar for example).
  */
-goog.module('app.MainController');
 
-goog.module.declareLegacyNamespace();
-const appModule = goog.require('app.module');
-const appLocationControl = goog.require('app.LocationControl');
-const appMap = goog.require('app.Map');
-const olFeature = goog.require('ol.Feature');
-const olGeomPoint = goog.require('ol.geom.Point');
-const olMapProperty = goog.require('ol.MapProperty');
-const olInteraction = goog.require('ol.interaction');
-const olLayerVector = goog.require('ol.layer.Vector');
-const ngeoMiscSyncArrays = goog.require('ngeo.misc.syncArrays');
-const olEvents = goog.require('ol.events');
-const olObject = goog.require('ol.Object');
-const olView = goog.require('ol.View');
-const olControlAttribution = goog.require('ol.control.Attribution');
-const olControlFullScreen = goog.require('ol.control.FullScreen');
-const olControlOverviewMap = goog.require('ol.control.OverviewMap');
-const olControlZoom = goog.require('ol.control.Zoom');
-const appOlcsZoomToExtent = goog.require('app.olcs.ZoomToExtent');
-const appOlcsLux3DManager = goog.require('app.olcs.Lux3DManager');
-const olProj = goog.require('ol.proj');
-const olMath = goog.require('ol.math');
-
+import appModule from './module.js';
+import appLocationControl from './LocationControl.js';
+import appMap from './Map.js';
+import olFeature from 'ol/Feature.js';
+import olGeomPoint from 'ol/geom/Point.js';
+import olMapProperty from 'ol/MapProperty.js';
+import olInteraction from 'ol/interaction.js';
+import olLayerVector from 'ol/layer/Vector.js';
+import ngeoMiscSyncArrays from 'ngeo/misc/syncArrays.js';
+import olEvents from 'ol/events.js';
+import olObject from 'ol/Object.js';
+import olView from 'ol/View.js';
+import olControlAttribution from 'ol/control/Attribution.js';
+import olControlFullScreen from 'ol/control/FullScreen.js';
+import olControlOverviewMap from 'ol/control/OverviewMap.js';
+import olControlZoom from 'ol/control/Zoom.js';
+import appOlcsZoomToExtent from './olcs/ZoomToExtent.js';
+import appOlcsLux3DManager from './olcs/Lux3DManager.js';
+import olProj from 'ol/proj.js';
+import olMath from 'ol/math.js';
 
 /**
  * @param {angular.Scope} $scope Scope.
@@ -75,7 +75,7 @@ const olMath = goog.require('ol.math');
  * @export
  * @ngInject
  */
-exports = function(
+const exports = function(
     $scope, ngeoFeatureOverlayMgr, ngeoBackgroundLayerMgr, ngeoOfflineServiceManager,
     gettextCatalog, appExclusionManager, appLayerOpacityManager,
     appLayerPermalinkManager, appMymaps, appStateManager, appThemes, appTheme,
@@ -924,3 +924,6 @@ exports.prototype.isDisconnectedOrOffline = function() {
 };
 
 appModule.controller('MainController', exports);
+
+
+export default exports;

@@ -1,4 +1,7 @@
 /**
+ * @module app.profile.ProfileController
+ */
+/**
  * @fileoverview This file provides a profile directive. This directive is used
  * to create a profile panel in the page.
  *
@@ -12,21 +15,18 @@
  * One-time binding is used because we know the map is not going to change
  * during the lifetime of the application.
  */
-goog.module('app.profile.ProfileController');
 
-goog.module.declareLegacyNamespace();
-const appModule = goog.require('app.module');
-const olEvents = goog.require('ol.events');
-const olFeature = goog.require('ol.Feature');
-const olMapBrowserEventType = goog.require('ol.MapBrowserEventType');
-const olOverlay = goog.require('ol.Overlay');
-const olGeomGeometryLayout = goog.require('ol.geom.GeometryLayout');
-const olGeomLineString = goog.require('ol.geom.LineString');
-const olGeomPoint = goog.require('ol.geom.Point');
-const olStyleCircle = goog.require('ol.style.Circle');
-const olStyleFill = goog.require('ol.style.Fill');
-const olStyleStyle = goog.require('ol.style.Style');
-
+import appModule from '../module.js';
+import olEvents from 'ol/events.js';
+import olFeature from 'ol/Feature.js';
+import olMapBrowserEventType from 'ol/MapBrowserEventType.js';
+import olOverlay from 'ol/Overlay.js';
+import olGeomGeometryLayout from 'ol/geom/GeometryLayout.js';
+import olGeomLineString from 'ol/geom/LineString.js';
+import olGeomPoint from 'ol/geom/Point.js';
+import olStyleCircle from 'ol/style/Circle.js';
+import olStyleFill from 'ol/style/Fill.js';
+import olStyleStyle from 'ol/style/Style.js';
 
 /**
  * @constructor
@@ -38,7 +38,7 @@ const olStyleStyle = goog.require('ol.style.Style');
  * @export
  * @ngInject
  */
-exports = function($scope, ngeoFeatureOverlayMgr, echocsvUrl,
+const exports = function($scope, ngeoFeatureOverlayMgr, echocsvUrl,
     $document) {
 
   /**
@@ -389,3 +389,6 @@ exports.prototype.exportCSV = function() {
 };
 
 appModule.controller('AppProfileController', exports);
+
+
+export default exports;

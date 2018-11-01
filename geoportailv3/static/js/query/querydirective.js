@@ -1,15 +1,14 @@
-goog.module('app.query.queryDirective');
-
-goog.module.declareLegacyNamespace();
-const appModule = goog.require('app.module');
-
+/**
+ * @module app.query.queryDirective
+ */
+import appModule from '../module.js';
 
 /**
  * @param {string} appQueryTemplateUrl URL to directive template.
  * @return {angular.Directive} The Directive Definition Object.
  * @ngInject
  */
-exports = function(appQueryTemplateUrl) {
+const exports = function(appQueryTemplateUrl) {
   return {
     restrict: 'E',
     scope: {
@@ -28,4 +27,8 @@ exports = function(appQueryTemplateUrl) {
     templateUrl: appQueryTemplateUrl
   };
 };
+
 appModule.directive('appQuery', exports);
+
+
+export default exports;
